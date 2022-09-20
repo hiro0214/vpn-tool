@@ -1,6 +1,7 @@
 import { memo, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { useData } from '../providers/DataProvider';
 
 export const Login = memo(() => {
@@ -22,11 +23,23 @@ export const Login = memo(() => {
   }, [acceptedFiles]);
 
   return (
-    <div className='container'>
-      <div {...getRootProps({ className: 'dropzone' })} style={{ border: 'solid 1px' }}>
+    <Container>
+      <Dropzone {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
-        <p>ここにファイルを入れてください。</p>
-      </div>
-    </div>
+        <span>ここにファイルを入れてください。</span>
+      </Dropzone>
+    </Container>
   );
 });
+
+const Container = styled.div``;
+
+const Dropzone = styled.div`
+  width: 100%;
+  height: 300px;
+  padding: 12px;
+  background: #fff;
+  border: 1px dotted #000;
+  border-radius: 5px;
+  cursor: pointer;
+`;

@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Route, Routes } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
-import { pageRoutes } from './pageRoutes';
+import { pageRoutes } from './PageRoutes';
 
 export const Router = memo(() => {
   return (
