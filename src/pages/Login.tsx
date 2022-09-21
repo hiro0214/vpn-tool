@@ -10,6 +10,17 @@ export const Login = memo(() => {
   const navigate = useNavigate();
   const { setData } = useData();
 
+  const indexArray = {
+    id: 0,
+    applicantName: 1,
+    userName: 7,
+    userNameKana: 9,
+    userMail: 11,
+    startDate: 21,
+    endDate: 23,
+    // firstAuthorizerName: 20,
+  };
+
   useEffect(() => {
     if (!acceptedFiles.length) return;
 
@@ -17,7 +28,21 @@ export const Login = memo(() => {
     reader.onload = (e) => {
       const target = e.target as FileReader;
       const data = target.result as string;
-      setData(JSON.parse(data));
+      const splitData = data.split('\r\n');
+
+      const keys = Object.keys(indexArray);
+      const values = Object.values(indexArray);
+
+      const shapingData = splitData.map((_data) => {
+        const obj: any = {};
+        keys.forEach((k, i) => {
+          obj[k] = _data.split(',')[values[i]];
+        });
+
+        return obj;
+      });
+
+      setData(shapingData);
       navigate('/');
     };
   }, [acceptedFiles]);
