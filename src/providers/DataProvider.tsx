@@ -2,7 +2,11 @@ import { ReactNode, createContext, useState, useContext, Dispatch, SetStateActio
 
 export type DataType = {
   id: string;
-  name: string;
+  applicantName: string;
+  userName: string;
+  userMail: string;
+  startDate: string;
+  endDate: string;
 };
 
 export type DataContextType = {

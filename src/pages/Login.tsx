@@ -14,7 +14,6 @@ export const Login = memo(() => {
     id: 0,
     applicantName: 1,
     userName: 7,
-    userNameKana: 9,
     userMail: 11,
     startDate: 21,
     endDate: 23,
@@ -29,14 +28,14 @@ export const Login = memo(() => {
       const target = e.target as FileReader;
       const data = target.result as string;
       const splitData = data.split('\r\n');
-
+      const filterData = splitData.filter((d) => d.length !== 0);
       const keys = Object.keys(indexArray);
       const values = Object.values(indexArray);
 
-      const shapingData = splitData.map((_data) => {
+      const shapingData = filterData.map((_data) => {
         const obj: any = {};
         keys.forEach((k, i) => {
-          obj[k] = _data.split(',')[values[i]];
+          obj[k] = _data.split(',')[values[i]].replace(/["]/g, '').replace(/\s+/g, '');
         });
 
         return obj;
@@ -48,18 +47,18 @@ export const Login = memo(() => {
   }, [acceptedFiles]);
 
   return (
-    <Container>
-      <Dropzone {...getRootProps({ className: 'dropzone' })}>
+    <_Wrapper>
+      <_Dropzone {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
         <span>ここにファイルを入れてください。</span>
-      </Dropzone>
-    </Container>
+      </_Dropzone>
+    </_Wrapper>
   );
 });
 
-const Container = styled.div``;
+const _Wrapper = styled.div``;
 
-const Dropzone = styled.div`
+const _Dropzone = styled.div`
   width: 100%;
   height: 300px;
   padding: 12px;

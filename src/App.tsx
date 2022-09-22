@@ -5,22 +5,22 @@ import { Router } from './router/Router';
 export const App = () => {
   return (
     <Provider>
-      <Main>
-        <Container>
+      <_Main>
+        <_Container>
           <Router />
-        </Container>
-      </Main>
+        </_Container>
+      </_Main>
     </Provider>
   );
 };
 
-const Main = styled.main`
+const _Main = styled.main`
   position: relative;
   padding-top: 50px;
   padding-bottom: 50px;
 `;
 
-const Container = styled.div`
+const _Container = styled.div`
   width: 100%;
   max-width: 1240px;
   margin-left: auto;
