@@ -3,22 +3,13 @@ import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useData } from '../providers/DataProvider';
+import { csvIndexArray } from '../variable';
 
 export const Login = memo(() => {
   const reader = new FileReader();
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
   const navigate = useNavigate();
   const { setData } = useData();
-
-  const indexArray = {
-    id: 0,
-    applicantName: 1,
-    userName: 7,
-    userMail: 11,
-    startDate: 21,
-    endDate: 23,
-    // firstAuthorizerName: 20,
-  };
 
   useEffect(() => {
     if (!acceptedFiles.length) return;
@@ -29,13 +20,22 @@ export const Login = memo(() => {
       const data = target.result as string;
       const splitData = data.split('\r\n');
       const filterData = splitData.filter((d) => d.length !== 0);
-      const keys = Object.keys(indexArray);
-      const values = Object.values(indexArray);
+      const keys = Object.keys(csvIndexArray);
+      const values = Object.values(csvIndexArray);
 
       const shapingData = filterData.map((_data) => {
         const obj: any = {};
         keys.forEach((k, i) => {
-          obj[k] = _data.split(',')[values[i]].replace(/["]/g, '').replace(/\s+/g, '');
+          if (k === 'applicantName') {
+            const v = _data
+              .split(',')
+              [values[i]].replace(/["]/g, '')
+              .split(/[\x20\u3000]/);
+            obj['applicantLastName'] = v[0];
+            obj['applicantFirstName'] = v[1];
+          } else {
+            obj[k] = _data.split(',')[values[i]].replace(/["]/g, '').replace(/\s+/g, '');
+          }
         });
 
         return obj;

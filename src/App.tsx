@@ -21,8 +21,7 @@ const _Main = styled.main`
 `;
 
 const _Container = styled.div`
-  width: 100%;
-  max-width: 1240px;
+  width: 1240px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 20px;

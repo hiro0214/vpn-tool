@@ -12,6 +12,17 @@ export const Top = memo(() => {
     if (data.length === 0) navigate('/login');
   }, []);
 
+  const getDay = (day: string) => {
+    const dayIndex = new Date(day).getDay();
+    const dayWeekArray = ['日', '月', '火', '水', '木', '金', '土'];
+
+    if (typeof dayIndex === 'number') {
+      return `${day}(${dayWeekArray[dayIndex]})`;
+    } else {
+      return '-';
+    }
+  };
+
   return (
     <_Wrapper>
       <_Table>
@@ -30,7 +41,16 @@ export const Top = memo(() => {
             <tr key={_data.id}>
               <td>{_data.id}</td>
               <td>
-                <TextInput value={_data.applicantName} />
+                <_Row>
+                  <_RowItem>
+                    <TextInput value={_data.applicantLastName} />
+                  </_RowItem>
+                  <_RowItem>
+                    <TextInput value={_data.applicantFirstName} />
+                  </_RowItem>
+                </_Row>
+                <_Separate />
+                <TextInput value={_data.applicantMail} />
               </td>
               <td>
                 <TextInput value={_data.userName} />
@@ -38,17 +58,17 @@ export const Top = memo(() => {
                 <TextInput value={_data.userMail} />
               </td>
               <td>
-                <TextInput value={''} />
+                <TextInput value={_data.firstAuthorizerName} />
                 <_Separate />
                 <TextInput value={''} />
               </td>
               <td>
-                <TextInput value={''} />
+                <TextInput value={_data.secondAuthorizerName} />
                 <_Separate />
                 <TextInput value={''} />
               </td>
               <td>
-                {_data.startDate} ~ {_data.endDate}
+                {getDay(_data.startDate)} ~ {getDay(_data.endDate)}
               </td>
             </tr>
           ))}
@@ -83,22 +103,28 @@ const _Table = styled.table`
     &:nth-of-type(1) {
       width: 80px;
     }
-    &:nth-of-type(2) {
-      width: 150px;
-    }
+    &:nth-of-type(2),
     &:nth-of-type(3),
     &:nth-of-type(4),
     &:nth-of-type(5) {
-      width: 270px;
+      width: 250px;
     }
     &:nth-of-type(6) {
-      width: 150px;
+      width: 120px;
     }
   }
   td {
     border: 1px solid #ccc;
   }
 `;
+
+const _Row = styled.ul`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+`;
+
+const _RowItem = styled.li``;
 
 const _Separate = styled.span`
   display: block;
