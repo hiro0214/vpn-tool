@@ -1,11 +1,17 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: './',
   root: './src/',
-  plugins: [react()],
+  plugins: [
+    react(),
+    viteStaticCopy({
+      targets: [{ src: '../userlist.csv', dest: '' }],
+    }),
+  ],
   build: {
     outDir: '../dist/',
     emptyOutDir: true,

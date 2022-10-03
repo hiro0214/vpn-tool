@@ -2,6 +2,7 @@ import { ReactNode, createContext, useState, useContext, Dispatch, SetStateActio
 
 export type DataType = {
   id: string;
+  applicantName: string;
   applicantFirstName: string;
   applicantLastName: string;
   applicantMail: string;
@@ -10,12 +11,23 @@ export type DataType = {
   startDate: string;
   endDate: string;
   firstAuthorizerName: string;
+  firstAuthorizerMail: string;
   secondAuthorizerName: string;
+  secondAuthorizerMail: string;
+};
+
+export type UserListType = {
+  name: string;
+  firstName: string;
+  lastName: string;
+  mail: string;
 };
 
 export type DataContextType = {
   data: DataType[];
+  userList: UserListType[];
   setData: Dispatch<SetStateAction<DataType[]>>;
+  setUserList: Dispatch<SetStateAction<UserListType[]>>;
 };
 
 export const DataContext = createContext({} as DataContextType);
@@ -23,8 +35,9 @@ export const DataContext = createContext({} as DataContextType);
 export const DataProvider = (props: { children: ReactNode }) => {
   const { children } = props;
   const [data, setData] = useState([] as DataType[]);
+  const [userList, setUserList] = useState([] as UserListType[]);
 
-  return <DataContext.Provider value={{ data, setData }}>{children}</DataContext.Provider>;
+  return <DataContext.Provider value={{ data, userList, setData, setUserList }}>{children}</DataContext.Provider>;
 };
 
 export const useData = (): DataContextType => useContext(DataContext);

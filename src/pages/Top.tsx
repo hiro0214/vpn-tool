@@ -17,7 +17,7 @@ export const Top = memo(() => {
     const dayWeekArray = ['日', '月', '火', '水', '木', '金', '土'];
 
     if (typeof dayIndex === 'number') {
-      return `${day}(${dayWeekArray[dayIndex]})`;
+      return `${day}（${dayWeekArray[dayIndex]}）`;
     } else {
       return '-';
     }
@@ -60,12 +60,12 @@ export const Top = memo(() => {
               <td>
                 <TextInput value={_data.firstAuthorizerName} />
                 <_Separate />
-                <TextInput value={''} />
+                <TextInput value={_data.firstAuthorizerMail} />
               </td>
               <td>
                 <TextInput value={_data.secondAuthorizerName} />
                 <_Separate />
-                <TextInput value={''} />
+                <TextInput value={_data.secondAuthorizerMail} />
               </td>
               <td>
                 {getDay(_data.startDate)} ~ {getDay(_data.endDate)}
@@ -107,10 +107,10 @@ const _Table = styled.table`
     &:nth-of-type(3),
     &:nth-of-type(4),
     &:nth-of-type(5) {
-      width: 250px;
+      width: 240px;
     }
     &:nth-of-type(6) {
-      width: 120px;
+      width: 160px;
     }
   }
   td {

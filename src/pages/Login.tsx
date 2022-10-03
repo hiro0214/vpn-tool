@@ -1,48 +1,101 @@
 import { memo, useEffect } from 'react';
+import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useData } from '../providers/DataProvider';
-import { csvIndexArray } from '../variable';
+import { useData, UserListType } from '../providers/DataProvider';
+import { dataCsvIndexArray, userListCsvIndexArray } from '../variable';
 
 export const Login = memo(() => {
   const reader = new FileReader();
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
   const navigate = useNavigate();
-  const { setData } = useData();
+  const { setData, setUserList } = useData();
+
+  let userList: UserListType[] = [] as UserListType[];
+
+  const getUser = (name: string) => userList.find((v) => v.name === name);
+
+  const getValue = (value: string) => value.replace(/["]/g, '').replace(/\s+/g, '');
 
   useEffect(() => {
     if (!acceptedFiles.length) return;
 
     reader.readAsText(acceptedFiles[0]);
     reader.onload = (e) => {
-      const target = e.target as FileReader;
-      const data = target.result as string;
-      const splitData = data.split('\r\n');
-      const filterData = splitData.filter((d) => d.length !== 0);
-      const keys = Object.keys(csvIndexArray);
-      const values = Object.values(csvIndexArray);
+      axios
+        .get('./userlist.csv')
+        .then((res) => {
+          const userDataCsv = res.data as string;
+          const userDataArray = userDataCsv.split('\r\n').map((v) => v.split(','));
 
-      const shapingData = filterData.map((_data) => {
-        const obj: any = {};
-        keys.forEach((k, i) => {
-          if (k === 'applicantName') {
-            const v = _data
-              .split(',')
-              [values[i]].replace(/["]/g, '')
-              .split(/[\x20\u3000]/);
-            obj['applicantLastName'] = v[0];
-            obj['applicantFirstName'] = v[1];
-          } else {
-            obj[k] = _data.split(',')[values[i]].replace(/["]/g, '').replace(/\s+/g, '');
-          }
-        });
+          const keys = Object.keys(userListCsvIndexArray);
+          const values = Object.values(userListCsvIndexArray);
 
-        return obj;
-      });
+          userDataArray.shift();
+          userList = userDataArray.map((_data) => {
+            const obj: any = {};
+            keys.forEach((key, i) => (obj[key] = _data[values[i]].replace(/\s+/g, '')));
+            return obj;
+          });
 
-      setData(shapingData);
-      navigate('/');
+          setUserList(userList);
+        })
+        .then(() => {
+          const target = e.target as FileReader;
+          const dataCsv = target.result as string;
+          const splitDataArray = dataCsv
+            .split('\r\n')
+            .map((v) => {
+              if (v.length !== 0) return v.split(',');
+            })
+            .filter((e) => e);
+
+          const keys = Object.keys(dataCsvIndexArray);
+          const values = Object.values(dataCsvIndexArray);
+
+          const shapingData = splitDataArray.map((_data) => {
+            if (!_data) return;
+
+            const obj: any = {};
+            keys.forEach((key, i) => {
+              if (key === 'applicantName') {
+                const applicantName = getValue(_data[values[i]]);
+                const targetUser = getUser(applicantName);
+
+                obj['applicantName'] = applicantName;
+                obj['applicantFirstName'] = targetUser?.firstName;
+                obj['applicantLastName'] = targetUser?.lastName;
+                obj['applicantMail'] = targetUser?.mail;
+              } else if (key === 'userName') {
+                const userName = getValue(_data[values[i]]);
+                const targetUser = getUser(userName);
+
+                obj['userName'] = targetUser ? targetUser.name : userName;
+                obj['userMail'] = targetUser?.mail;
+              } else if (key === 'firstAuthorizerName') {
+                const firstAuthorizerName = getValue(_data[values[i]]);
+                const targetUser = getUser(firstAuthorizerName);
+
+                obj['firstAuthorizerName'] = targetUser ? targetUser.name : firstAuthorizerName;
+                obj['firstAuthorizerMail'] = targetUser?.mail;
+              } else if (key === 'secondAuthorizerName') {
+                const secondAuthorizerName = getValue(_data[values[i]]);
+                const targetUser = getUser(secondAuthorizerName);
+
+                obj['secondAuthorizerName'] = targetUser ? targetUser.name : secondAuthorizerName;
+                obj['secondAuthorizerMail'] = targetUser?.mail;
+              } else {
+                obj[key] = getValue(_data[values[i]]);
+              }
+            });
+
+            return obj;
+          });
+
+          setData(shapingData);
+        })
+        .finally(() => navigate('/'));
     };
   }, [acceptedFiles]);
 
