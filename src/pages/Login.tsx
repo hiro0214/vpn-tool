@@ -7,10 +7,10 @@ import { useData, UserListType } from '../providers/DataProvider';
 import { dataCsvIndexArray, userListCsvIndexArray } from '../variable';
 
 export const Login = memo(() => {
-  const reader = new FileReader();
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
   const navigate = useNavigate();
   const { setData, setUserList } = useData();
+  const reader = new FileReader();
 
   let userList: UserListType[] = [] as UserListType[];
 

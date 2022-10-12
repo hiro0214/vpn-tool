@@ -1,7 +1,9 @@
 import { memo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { Button } from '../components/Button';
 import { TextInput } from '../components/TextInput';
+import { startMailer } from '../mailer/mailer';
 import { useData } from '../providers/DataProvider';
 
 export const Top = memo(() => {
@@ -34,6 +36,7 @@ export const Top = memo(() => {
             <th>一次承認者</th>
             <th>二次承認者</th>
             <th>利用期間</th>
+            <th>メール</th>
           </tr>
         </thead>
         <tbody>
@@ -43,32 +46,44 @@ export const Top = memo(() => {
               <td>
                 <_Row>
                   <_RowItem>
-                    <TextInput value={_data.applicantLastName} />
+                    <TextInput value={_data.applicantLastName} name={'applicantLastName'} />
                   </_RowItem>
                   <_RowItem>
-                    <TextInput value={_data.applicantFirstName} />
+                    <TextInput value={_data.applicantFirstName} name={'applicantFirstName'} />
                   </_RowItem>
                 </_Row>
                 <_Separate />
-                <TextInput value={_data.applicantMail} />
+                <TextInput value={_data.applicantMail} name={'applicantMail'} />
               </td>
               <td>
-                <TextInput value={_data.userName} />
+                <TextInput value={_data.userName} name={'userName'} />
                 <_Separate />
-                <TextInput value={_data.userMail} />
+                <TextInput value={_data.userMail} name={'userMail'} />
               </td>
               <td>
-                <TextInput value={_data.firstAuthorizerName} />
+                <TextInput value={_data.firstAuthorizerName} name={'firstAuthorizerName'} />
                 <_Separate />
-                <TextInput value={_data.firstAuthorizerMail} />
+                <TextInput value={_data.firstAuthorizerMail} name={'firstAuthorizerMail'} />
               </td>
               <td>
-                <TextInput value={_data.secondAuthorizerName} />
+                <TextInput value={_data.secondAuthorizerName} name={'secondAuthorizerName'} />
                 <_Separate />
-                <TextInput value={_data.secondAuthorizerMail} />
+                <TextInput value={_data.secondAuthorizerMail} name={'secondAuthorizerMail'} />
               </td>
               <td>
-                {getDay(_data.startDate)} ~ {getDay(_data.endDate)}
+                <span data-name={'startDate'}>{getDay(_data.startDate)}</span>
+                <br />~
+                <br />
+                <span data-name={'endDate'}>{getDay(_data.endDate)}</span>
+              </td>
+              <td>
+                <Button name={'connect'} onclick={startMailer}>
+                  接続環境
+                </Button>
+                <_Separate />
+                <Button name={'account'} onclick={startMailer}>
+                  アカウント
+                </Button>
               </td>
             </tr>
           ))}
@@ -107,10 +122,13 @@ const _Table = styled.table`
     &:nth-of-type(3),
     &:nth-of-type(4),
     &:nth-of-type(5) {
-      width: 240px;
+      width: 210px;
     }
     &:nth-of-type(6) {
-      width: 160px;
+      width: 155px;
+    }
+    &:nth-of-type(7) {
+      width: 125px;
     }
   }
   td {
@@ -132,4 +150,5 @@ const _Separate = styled.span`
   margin-top: 10px;
   margin-bottom: 10px;
   border-top: 1px dotted #333;
+  pointer-events: none;
 `;
