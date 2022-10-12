@@ -1,24 +1,66 @@
-import { accountSubject, carbonCopyList, connectSubject } from './config';
+import { DataType } from '../providers/DataProvider';
+import { accountSubject, carbonCopyList, connectSubject, signatureText } from './config';
 import { accountText } from './templates/account';
 import { connectText } from './templates/connect';
 
+interface DataTypeAble {
+  [key: string]: string;
+}
+
 type MailNameType = 'connect' | 'account';
+
+const dataArray: DataType = {
+  id: '申請ID',
+  applicantName: '申請者名',
+  applicantFirstName: '申請者名前',
+  applicantLastName: '申請者苗字',
+  applicantMail: '申請者アドレス',
+  userName: '利用者名',
+  userMail: '利用者アドレス',
+  startDate: '開始日',
+  endDate: '終了日',
+  firstAuthorizerName: '一次承認者名',
+  firstAuthorizerMail: '一次承認者アドレス',
+  secondAuthorizerName: '二次承認者名',
+  secondAuthorizerMail: '二次承認者アドレス',
+};
 
 const getcarbonCopyList = (): string => carbonCopyList.join(',');
 
-const setMailConfig = (target: HTMLAnchorElement, name: MailNameType) => {
+const replaceText = (data: DataTypeAble, text: string): string => {
+  const keys = Object.keys(dataArray);
+  keys.forEach((key) => {
+    text = text.replace(`$${key}`, data[key]);
+  });
+
+  return text;
+};
+
+const replaceBreak = (text: string): string => text.replace(/\n\r?/g, '%0D%0A');
+
+const getBody = (data: DataType, name: MailNameType) => {
+  const baseText = name === 'connect' ? connectText : accountText;
+  let text = replaceText(data, baseText);
+  text += signatureText;
+  text = replaceBreak(text);
+
+  return text;
+};
+
+const setMailConfig = (data: DataType, target: HTMLAnchorElement, name: MailNameType): void => {
   const address = 'hoge@sample.com';
+  // const address = data.userMail;
   const carbonCopy = 'fuga@sample.com';
   // const carbonCopy = getcarbonCopyList();
   const subject = name === 'connect' ? connectSubject : accountSubject;
-  const body = name === 'connect' ? connectText : accountText;
+  const body = getBody(data, name);
 
-  target.href = `mailto:${address}?cc=${carbonCopy}?subject=${subject}?body=${body}`;
+  target.href = `mailto:${address}?cc=${carbonCopy}&subject=${subject}&body=${body}`;
 };
 
-export const startMailer = (e: React.MouseEvent<HTMLAnchorElement>) => {
+export const startMailer = (e: React.MouseEvent<HTMLAnchorElement>, data: DataType): void => {
   const target = e.target as HTMLAnchorElement;
   const name = target.getAttribute('data-name') as MailNameType;
 
-  setMailConfig(target, name);
+  setMailConfig(data, target, name);
 };

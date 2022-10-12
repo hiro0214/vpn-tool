@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { memo, useEffect } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone';

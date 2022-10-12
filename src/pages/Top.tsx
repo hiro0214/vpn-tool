@@ -40,8 +40,8 @@ export const Top = memo(() => {
           </tr>
         </thead>
         <tbody>
-          {data.map((_data) => (
-            <tr key={_data.id}>
+          {data.map((_data, i) => (
+            <tr key={_data.id} data-index={i}>
               <td>{_data.id}</td>
               <td>
                 <_Row>
@@ -77,11 +77,11 @@ export const Top = memo(() => {
                 <span data-name={'endDate'}>{getDay(_data.endDate)}</span>
               </td>
               <td>
-                <Button name={'connect'} onclick={startMailer}>
+                <Button name={'connect'} onclick={(e) => startMailer(e, data[i])}>
                   接続環境
                 </Button>
                 <_Separate />
-                <Button name={'account'} onclick={startMailer}>
+                <Button name={'account'} onclick={(e) => startMailer(e, data[i])}>
                   アカウント
                 </Button>
               </td>
