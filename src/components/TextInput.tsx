@@ -1,18 +1,24 @@
-import { ChangeEvent, FC, memo, useState } from 'react';
+import { ChangeEvent, FC, memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { DataTypeKey } from '../providers/DataProvider';
 
 type Props = {
   value: string;
-  name: string;
+  name: DataTypeKey;
+  updateValue: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const TextInput: FC<Props> = memo((props) => {
-  const { value, name } = props;
+  const { value, name, updateValue } = props;
   const [val, setVal] = useState(value);
 
-  const changeVal = (e: ChangeEvent<HTMLInputElement>) => setVal(e.target.value);
+  useEffect(() => {
+    setVal(value);
+  }, [value]);
 
-  return <_Input type={'text'} name={name} value={val} onChange={changeVal} />;
+  const changeValue = (e: ChangeEvent<HTMLInputElement>) => setVal(e.target.value);
+
+  return <_Input type={'text'} name={name} value={val} onChange={changeValue} onBlur={updateValue} />;
 });
 
 const _Input = styled.input`

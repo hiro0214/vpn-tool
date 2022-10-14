@@ -16,6 +16,21 @@ export type DataType = {
   secondAuthorizerMail: string;
 };
 
+export type DataTypeKey =
+  | 'id'
+  | 'applicantName'
+  | 'applicantFirstName'
+  | 'applicantLastName'
+  | 'applicantMail'
+  | 'userName'
+  | 'userMail'
+  | 'startDate'
+  | 'endDate'
+  | 'firstAuthorizerName'
+  | 'firstAuthorizerMail'
+  | 'secondAuthorizerName'
+  | 'secondAuthorizerMail';
+
 export type UserListType = {
   name: string;
   firstName: string;
