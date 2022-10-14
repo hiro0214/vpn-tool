@@ -1,3 +1,2 @@
-export const accountText = `
-テキストがはいります
+export const accountText = `テキストがはいります
 `;

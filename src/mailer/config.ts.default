@@ -1,0 +1,8 @@
+export const connectSubject = '';
+
+export const accountSubject = '';
+
+export const carbonCopyList = [];
+
+export const signatureText = `
+`;

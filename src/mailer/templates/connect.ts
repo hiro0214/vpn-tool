@@ -1,5 +1,4 @@
-export const connectText = `
-申請ID
+export const connectText = `申請ID
 $id
 
 申請者名

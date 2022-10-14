@@ -1,3 +1,4 @@
 node_modules
 dist
 userlist.csv
+src/mailer/config.ts

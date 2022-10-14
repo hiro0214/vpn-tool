@@ -48,10 +48,8 @@ const getBody = (data: DataType, name: MailNameType) => {
 };
 
 const setMailConfig = (data: DataType, target: HTMLAnchorElement, name: MailNameType): void => {
-  const address = 'hoge@sample.com';
-  // const address = data.userMail;
-  const carbonCopy = 'fuga@sample.com';
-  // const carbonCopy = getcarbonCopyList();
+  const address = data.applicantMail;
+  const carbonCopy = getcarbonCopyList();
   const subject = name === 'connect' ? connectSubject : accountSubject;
   const body = getBody(data, name);
 
