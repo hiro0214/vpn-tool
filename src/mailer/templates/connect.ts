@@ -5,11 +5,11 @@ $id
 申請者名
 $applicantName
 
-申請者名前
-$applicantFirstName
-
 申請者苗字
 $applicantLastName
+
+申請者名前
+$applicantFirstName
 
 申請者アドレス
 $applicantMail

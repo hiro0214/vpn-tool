@@ -68,7 +68,7 @@ export const Top = memo(() => {
           {data.map((_data, i) => (
             <tr key={_data.id} data-index={i}>
               <td>{_data.id}</td>
-              <td>
+              <td data-name={'applicant'}>
                 <_Row>
                   <_RowItem>
                     <TextInput
@@ -88,12 +88,12 @@ export const Top = memo(() => {
                 <_Separate />
                 <TextInput value={_data.applicantMail} name={'applicantMail'} updateValue={(e) => updateValue(e, i)} />
               </td>
-              <td>
+              <td data-name={'user'}>
                 <TextInput value={_data.userName} name={'userName'} updateValue={(e) => updateValue(e, i)} />
                 <_Separate />
                 <TextInput value={_data.userMail} name={'userMail'} updateValue={(e) => updateValue(e, i)} />
               </td>
-              <td>
+              <td data-name={'firstAuthorizer'}>
                 <TextInput
                   value={_data.firstAuthorizerName}
                   name={'firstAuthorizerName'}
@@ -107,7 +107,7 @@ export const Top = memo(() => {
                 />
                 <_ChangeIcon onClick={() => exchangeValue(i)} />
               </td>
-              <td>
+              <td data-name={'secondAuthorizer'}>
                 <TextInput
                   value={_data.secondAuthorizerName}
                   name={'secondAuthorizerName'}
