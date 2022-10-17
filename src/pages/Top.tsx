@@ -66,7 +66,7 @@ export const Top = memo(() => {
         </thead>
         <tbody>
           {data.map((_data, i) => (
-            <tr key={_data.id} data-index={i}>
+            <tr key={i} data-index={i}>
               <td>{_data.id}</td>
               <td data-name={'applicant'}>
                 <_Row>

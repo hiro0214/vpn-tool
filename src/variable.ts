@@ -7,10 +7,3 @@ export const dataCsvIndexArray = {
   firstAuthorizerName: 29,
   secondAuthorizerName: 34,
 };
-
-export const userListCsvIndexArray = {
-  name: 1,
-  lastName: 4,
-  firstName: 5,
-  mail: 10,
-};

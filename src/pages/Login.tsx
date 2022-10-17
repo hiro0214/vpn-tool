@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { memo, useEffect } from 'react';
-import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useData, UserListType } from '../providers/DataProvider';
-import { dataCsvIndexArray, userListCsvIndexArray } from '../variable';
+import { DataType, useData } from '../providers/DataProvider';
+import userList from '../userList.json';
+import { dataCsvIndexArray } from '../variable';
 
 export const Login = memo(() => {
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
@@ -14,90 +12,63 @@ export const Login = memo(() => {
   const { setData, setUserList } = useData();
   const reader = new FileReader();
 
-  let userList: UserListType[] = [] as UserListType[];
-
   const getUser = (name: string) => userList.find((v) => v.name === name);
 
-  const getValue = (value: string) => value.replace(/["]/g, '').replace(/\s+/g, '');
+  const getValue = (value: string) => (value ? value.replace(/["]/g, '').replace(/\s+/g, '') : '');
 
   useEffect(() => {
     if (!acceptedFiles.length) return;
 
     reader.readAsText(acceptedFiles[0]);
     reader.onload = (e) => {
-      axios
-        .get('./userlist.csv')
-        .then((res) => {
-          const userDataCsv = res.data as string;
-          const userDataArray = userDataCsv.split('\r\n').map((v) => v.split(','));
+      setUserList(userList);
 
-          const keys = Object.keys(userListCsvIndexArray);
-          const values = Object.values(userListCsvIndexArray);
+      const target = e.target as FileReader;
+      const dataCsv = target.result as string;
+      const splitDataArray = dataCsv.split('\r\n').map((v) => v.split(','));
+      const keys = Object.keys(dataCsvIndexArray);
+      const values = Object.values(dataCsvIndexArray);
 
-          userDataArray.shift();
-          userList = userDataArray.map((_data) => {
-            const obj: any = {};
-            keys.forEach((key, i) => (obj[key] = _data[values[i]].replace(/\s+/g, '')));
-            return obj;
-          });
+      const shapingData = splitDataArray.map((_data) => {
+        const data: DataType = {} as DataType;
+        keys.forEach((key, i) => {
+          if (key === 'applicantName') {
+            const applicantName = getValue(_data[values[i]]);
+            const targetUser = getUser(applicantName);
 
-          setUserList(userList);
-        })
-        .then(() => {
-          const target = e.target as FileReader;
-          const dataCsv = target.result as string;
-          const splitDataArray = dataCsv
-            .split('\r\n')
-            .map((v) => {
-              if (v.length !== 0) return v.split(',');
-            })
-            .filter((e) => e);
+            data.applicantName = applicantName;
+            data.applicantFirstName = targetUser?.firstName ?? '';
+            data.applicantLastName = targetUser?.lastName ?? '';
+            data.applicantMail = targetUser?.mail ?? '';
+          } else if (key === 'userName') {
+            const userName = getValue(_data[values[i]]);
+            const targetUser = getUser(userName);
 
-          const keys = Object.keys(dataCsvIndexArray);
-          const values = Object.values(dataCsvIndexArray);
+            data.userName = targetUser ? targetUser.name : userName;
+            data.userMail = targetUser?.mail ?? '';
+          } else if (key === 'firstAuthorizerName') {
+            const firstAuthorizerName = getValue(_data[values[i]]);
+            const targetUser = getUser(firstAuthorizerName);
 
-          const shapingData = splitDataArray.map((_data) => {
-            if (!_data) return;
+            data.firstAuthorizerName = targetUser ? targetUser.name : firstAuthorizerName;
+            data.firstAuthorizerMail = targetUser?.mail ?? '';
+          } else if (key === 'secondAuthorizerName') {
+            const secondAuthorizerName = getValue(_data[values[i]]);
+            const targetUser = getUser(secondAuthorizerName);
 
-            const obj: any = {};
-            keys.forEach((key, i) => {
-              if (key === 'applicantName') {
-                const applicantName = getValue(_data[values[i]]);
-                const targetUser = getUser(applicantName);
+            data.secondAuthorizerName = targetUser ? targetUser.name : secondAuthorizerName;
+            data.secondAuthorizerMail = targetUser?.mail ?? '';
+          } else {
+            const _key = key as 'id' | 'startDate' | 'endDate';
+            data[_key] = getValue(_data[values[i]]);
+          }
+        });
 
-                obj['applicantName'] = applicantName;
-                obj['applicantFirstName'] = targetUser?.firstName;
-                obj['applicantLastName'] = targetUser?.lastName;
-                obj['applicantMail'] = targetUser?.mail;
-              } else if (key === 'userName') {
-                const userName = getValue(_data[values[i]]);
-                const targetUser = getUser(userName);
+        return data;
+      });
 
-                obj['userName'] = targetUser ? targetUser.name : userName;
-                obj['userMail'] = targetUser?.mail;
-              } else if (key === 'firstAuthorizerName') {
-                const firstAuthorizerName = getValue(_data[values[i]]);
-                const targetUser = getUser(firstAuthorizerName);
-
-                obj['firstAuthorizerName'] = targetUser ? targetUser.name : firstAuthorizerName;
-                obj['firstAuthorizerMail'] = targetUser?.mail;
-              } else if (key === 'secondAuthorizerName') {
-                const secondAuthorizerName = getValue(_data[values[i]]);
-                const targetUser = getUser(secondAuthorizerName);
-
-                obj['secondAuthorizerName'] = targetUser ? targetUser.name : secondAuthorizerName;
-                obj['secondAuthorizerMail'] = targetUser?.mail;
-              } else {
-                obj[key] = getValue(_data[values[i]]);
-              }
-            });
-
-            return obj;
-          });
-
-          setData(shapingData);
-        })
-        .finally(() => navigate('/'));
+      setData(shapingData);
+      navigate('/');
     };
   }, [acceptedFiles]);
 
