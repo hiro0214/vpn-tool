@@ -1,18 +1,70 @@
-import { ChangeEvent, memo, useEffect } from 'react';
+import { ChangeEvent, memo, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button } from '../components/Button';
+import { Loading } from '../components/Loading';
 import { TextInput } from '../components/TextInput';
 import { startMailer } from '../mailer/mailer';
 import { DataType, DataTypeKey, useData } from '../providers/DataProvider';
+import userList from '../userList.json';
+import { dataCsvIndexArray } from '../variable';
 
 export const Top = memo(() => {
-  const { data, setData } = useData();
+  const [isLoading, setLoading] = useState(true);
+  const { data, csvData, setData } = useData();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (data.length === 0) navigate('/login');
-  }, [data]);
+    if (csvData.length === 0) navigate('/login');
+
+    const keys = Object.keys(dataCsvIndexArray);
+    const values = Object.values(dataCsvIndexArray);
+
+    const shapingData = csvData.map((_data) => {
+      const data: DataType = {} as DataType;
+      keys.forEach((key, i) => {
+        if (key === 'applicantName') {
+          const applicantName = getValue(_data[values[i]]);
+          const targetUser = getUser(applicantName);
+
+          data.applicantName = applicantName;
+          data.applicantFirstName = targetUser?.firstName ?? '';
+          data.applicantLastName = targetUser?.lastName ?? '';
+          data.applicantMail = targetUser?.mail ?? '';
+        } else if (key === 'userName') {
+          const userName = getValue(_data[values[i]]);
+          const targetUser = getUser(userName);
+
+          data.userName = targetUser ? targetUser.name : userName;
+          data.userMail = targetUser?.mail ?? '';
+        } else if (key === 'firstAuthorizerName') {
+          const firstAuthorizerName = getValue(_data[values[i]]);
+          const targetUser = getUser(firstAuthorizerName);
+
+          data.firstAuthorizerName = targetUser ? targetUser.name : firstAuthorizerName;
+          data.firstAuthorizerMail = targetUser?.mail ?? '';
+        } else if (key === 'secondAuthorizerName') {
+          const secondAuthorizerName = getValue(_data[values[i]]);
+          const targetUser = getUser(secondAuthorizerName);
+
+          data.secondAuthorizerName = targetUser ? targetUser.name : secondAuthorizerName;
+          data.secondAuthorizerMail = targetUser?.mail ?? '';
+        } else {
+          const _key = key as 'id' | 'startDate' | 'endDate';
+          data[_key] = getValue(_data[values[i]]);
+        }
+      });
+
+      return data;
+    });
+
+    setData(shapingData);
+    setLoading(false);
+  }, [csvData]);
+
+  const getUser = (name: string) => userList.find((v) => v.name === name);
+
+  const getValue = (value: string) => (value ? value.replace(/["]/g, '').replace(/\s+/g, '') : '');
 
   const exchangeValue = (dataIndex: number) => {
     const target: DataType = data[dataIndex];
@@ -52,93 +104,101 @@ export const Top = memo(() => {
 
   return (
     <_Wrapper>
-      <_Table>
-        <thead>
-          <tr>
-            <th>申請ID</th>
-            <th>申請者</th>
-            <th>利用者</th>
-            <th>一次承認者</th>
-            <th>二次承認者</th>
-            <th>利用期間</th>
-            <th>メール</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((_data, i) => (
-            <tr key={i} data-index={i}>
-              <td>{_data.id}</td>
-              <td data-name={'applicant'}>
-                <_Row>
-                  <_RowItem>
-                    <TextInput
-                      value={_data.applicantLastName}
-                      name={'applicantLastName'}
-                      updateValue={(e) => updateValue(e, i)}
-                    />
-                  </_RowItem>
-                  <_RowItem>
-                    <TextInput
-                      value={_data.applicantFirstName}
-                      name={'applicantFirstName'}
-                      updateValue={(e) => updateValue(e, i)}
-                    />
-                  </_RowItem>
-                </_Row>
-                <_Separate />
-                <TextInput value={_data.applicantMail} name={'applicantMail'} updateValue={(e) => updateValue(e, i)} />
-              </td>
-              <td data-name={'user'}>
-                <TextInput value={_data.userName} name={'userName'} updateValue={(e) => updateValue(e, i)} />
-                <_Separate />
-                <TextInput value={_data.userMail} name={'userMail'} updateValue={(e) => updateValue(e, i)} />
-              </td>
-              <td data-name={'firstAuthorizer'}>
-                <TextInput
-                  value={_data.firstAuthorizerName}
-                  name={'firstAuthorizerName'}
-                  updateValue={(e) => updateValue(e, i)}
-                />
-                <_Separate />
-                <TextInput
-                  value={_data.firstAuthorizerMail}
-                  name={'firstAuthorizerMail'}
-                  updateValue={(e) => updateValue(e, i)}
-                />
-                <_ChangeIcon onClick={() => exchangeValue(i)} />
-              </td>
-              <td data-name={'secondAuthorizer'}>
-                <TextInput
-                  value={_data.secondAuthorizerName}
-                  name={'secondAuthorizerName'}
-                  updateValue={(e) => updateValue(e, i)}
-                />
-                <_Separate />
-                <TextInput
-                  value={_data.secondAuthorizerMail}
-                  name={'secondAuthorizerMail'}
-                  updateValue={(e) => updateValue(e, i)}
-                />
-              </td>
-              <td>
-                <span data-name={'startDate'}>{getDay(_data.startDate)}</span>
-                <br />~
-                <br />
-                <span data-name={'endDate'}>{getDay(_data.endDate)}</span>
-              </td>
-              <td>
-                <Button name={'connect'} onclick={(e) => startMailer(e, data[i])}>
-                  接続環境
-                </Button>
-                <_Separate />
-                <Button name={'account'} onclick={(e) => startMailer(e, data[i])}>
-                  アカウント
-                </Button>
-              </td>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <_Table>
+          <thead>
+            <tr>
+              <th>申請ID</th>
+              <th>申請者</th>
+              <th>利用者</th>
+              <th>一次承認者</th>
+              <th>二次承認者</th>
+              <th>利用期間</th>
+              <th>メール</th>
             </tr>
-          ))}
-        </tbody>
-      </_Table>
+          </thead>
+          <tbody>
+            {data.map((_data, i) => (
+              <tr key={i} data-index={i}>
+                <td>{_data.id}</td>
+                <td data-name={'applicant'}>
+                  <_Row>
+                    <_RowItem>
+                      <TextInput
+                        value={_data.applicantLastName}
+                        name={'applicantLastName'}
+                        updateValue={(e) => updateValue(e, i)}
+                      />
+                    </_RowItem>
+                    <_RowItem>
+                      <TextInput
+                        value={_data.applicantFirstName}
+                        name={'applicantFirstName'}
+                        updateValue={(e) => updateValue(e, i)}
+                      />
+                    </_RowItem>
+                  </_Row>
+                  <_Separate />
+                  <TextInput
+                    value={_data.applicantMail}
+                    name={'applicantMail'}
+                    updateValue={(e) => updateValue(e, i)}
+                  />
+                </td>
+                <td data-name={'user'}>
+                  <TextInput value={_data.userName} name={'userName'} updateValue={(e) => updateValue(e, i)} />
+                  <_Separate />
+                  <TextInput value={_data.userMail} name={'userMail'} updateValue={(e) => updateValue(e, i)} />
+                </td>
+                <td data-name={'firstAuthorizer'}>
+                  <TextInput
+                    value={_data.firstAuthorizerName}
+                    name={'firstAuthorizerName'}
+                    updateValue={(e) => updateValue(e, i)}
+                  />
+                  <_Separate />
+                  <TextInput
+                    value={_data.firstAuthorizerMail}
+                    name={'firstAuthorizerMail'}
+                    updateValue={(e) => updateValue(e, i)}
+                  />
+                  <_ChangeIcon onClick={() => exchangeValue(i)} />
+                </td>
+                <td data-name={'secondAuthorizer'}>
+                  <TextInput
+                    value={_data.secondAuthorizerName}
+                    name={'secondAuthorizerName'}
+                    updateValue={(e) => updateValue(e, i)}
+                  />
+                  <_Separate />
+                  <TextInput
+                    value={_data.secondAuthorizerMail}
+                    name={'secondAuthorizerMail'}
+                    updateValue={(e) => updateValue(e, i)}
+                  />
+                </td>
+                <td>
+                  <span data-name={'startDate'}>{getDay(_data.startDate)}</span>
+                  <br />~
+                  <br />
+                  <span data-name={'endDate'}>{getDay(_data.endDate)}</span>
+                </td>
+                <td>
+                  <Button name={'connect'} onclick={(e) => startMailer(e, data[i])}>
+                    接続環境
+                  </Button>
+                  <_Separate />
+                  <Button name={'account'} onclick={(e) => startMailer(e, data[i])}>
+                    アカウント
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </_Table>
+      )}
     </_Wrapper>
   );
 });

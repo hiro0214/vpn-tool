@@ -40,9 +40,9 @@ export type UserListType = {
 
 export type DataContextType = {
   data: DataType[];
-  userList: UserListType[];
+  csvData: string[][];
   setData: Dispatch<SetStateAction<DataType[]>>;
-  setUserList: Dispatch<SetStateAction<UserListType[]>>;
+  setCsvData: Dispatch<SetStateAction<string[][]>>;
 };
 
 export const DataContext = createContext({} as DataContextType);
@@ -50,9 +50,9 @@ export const DataContext = createContext({} as DataContextType);
 export const DataProvider = (props: { children: ReactNode }) => {
   const { children } = props;
   const [data, setData] = useState([] as DataType[]);
-  const [userList, setUserList] = useState([] as UserListType[]);
+  const [csvData, setCsvData] = useState([] as string[][]);
 
-  return <DataContext.Provider value={{ data, userList, setData, setUserList }}>{children}</DataContext.Provider>;
+  return <DataContext.Provider value={{ data, csvData, setData, setCsvData }}>{children}</DataContext.Provider>;
 };
 
 export const useData = (): DataContextType => useContext(DataContext);

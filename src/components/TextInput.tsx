@@ -1,6 +1,7 @@
 import { ChangeEvent, FC, memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { DataTypeKey, useData, UserListType } from '../providers/DataProvider';
+import userList from '../userList.json';
 
 type Props = {
   value: string;
@@ -13,7 +14,7 @@ export const TextInput: FC<Props> = memo((props) => {
   const [val, setVal] = useState(value);
   const [isActive, setActive] = useState(false);
   const [searchList, setSearchList] = useState<UserListType[]>([]);
-  const { data, userList, setData } = useData();
+  const { data, setData } = useData();
 
   useEffect(() => {
     setVal(value);
