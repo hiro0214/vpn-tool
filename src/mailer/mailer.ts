@@ -25,12 +25,15 @@ const dataArray: DataType = {
   secondAuthorizerMail: '二次承認者アドレス',
 };
 
-const getcarbonCopyList = (): string => carbonCopyList.join(',');
+const getCarbonCopyList = (): string => carbonCopyList.join(',');
 
 const replaceText = (data: DataTypeAble, text: string): string => {
   const keys = Object.keys(dataArray);
   keys.forEach((key) => {
     text = text.replace(`$${key}`, data[key]);
+    if (key === 'startDate' || key === 'endDate') {
+      text = text.replace(/\(|\)/g, (s) => String.fromCharCode(s.charCodeAt(0) + 0xfee0));
+    }
   });
 
   return text;
@@ -49,7 +52,7 @@ const getBody = (data: DataType, name: MailNameType) => {
 
 const setMailConfig = (data: DataType, target: HTMLAnchorElement, name: MailNameType): void => {
   const address = data.applicantMail;
-  const carbonCopy = getcarbonCopyList();
+  const carbonCopy = getCarbonCopyList();
   const subject = name === 'connect' ? connectSubject : accountSubject;
   const body = getBody(data, name);
 

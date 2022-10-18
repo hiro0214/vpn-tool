@@ -2,6 +2,7 @@ import { ChangeEvent, memo, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button } from '../components/Button';
+import { Calendar } from '../components/Calendar';
 import { Loading } from '../components/Loading';
 import { TextInput } from '../components/TextInput';
 import { startMailer } from '../mailer/mailer';
@@ -49,8 +50,13 @@ export const Top = memo(() => {
 
           data.secondAuthorizerName = targetUser ? targetUser.name : secondAuthorizerName;
           data.secondAuthorizerMail = targetUser?.mail ?? '';
+        } else if (key === 'startDate' || key === 'endDate') {
+          const value = getValue(_data[values[i]]);
+          const date = formatDate(new Date(value));
+
+          data[key] = date;
         } else {
-          const _key = key as 'id' | 'startDate' | 'endDate';
+          const _key = key as 'id';
           data[_key] = getValue(_data[values[i]]);
         }
       });
@@ -65,6 +71,22 @@ export const Top = memo(() => {
   const getUser = (name: string) => userList.find((v) => v.name === name);
 
   const getValue = (value: string) => (value ? value.replace(/["]/g, '').replace(/\s+/g, '') : '');
+
+  const getDay = (date: Date) => {
+    const dayIndex = date.getDay();
+    const dayWeekArray = ['日', '月', '火', '水', '木', '金', '土'];
+
+    return dayWeekArray[dayIndex];
+  };
+
+  const formatDate = (_date: Date) => {
+    const year = _date.getFullYear();
+    const month = _date.getMonth() + 1;
+    const date = _date.getDate();
+    const day = getDay(_date);
+
+    return `${year}/${month}/${date}(${day})`;
+  };
 
   const exchangeValue = (dataIndex: number) => {
     const target: DataType = data[dataIndex];
@@ -91,15 +113,15 @@ export const Top = memo(() => {
     setData([...data]);
   };
 
-  const getDay = (day: string) => {
-    const dayIndex = new Date(day).getDay();
-    const dayWeekArray = ['日', '月', '火', '水', '木', '金', '土'];
+  const updateDate = (e: ChangeEvent<HTMLInputElement>, date: Date, dataIndex: number) => {
+    const target: DataType = data[dataIndex];
+    const element = e.target;
+    const container = element.closest('.container') as HTMLElement;
+    const input = container.querySelector('input') as HTMLInputElement;
+    const name = input.name as DataTypeKey;
 
-    if (typeof dayIndex === 'number') {
-      return `${day}（${dayWeekArray[dayIndex]}）`;
-    } else {
-      return '-';
-    }
+    target[name] = formatDate(date);
+    setData([...data]);
   };
 
   return (
@@ -179,11 +201,14 @@ export const Top = memo(() => {
                     updateValue={(e) => updateValue(e, i)}
                   />
                 </td>
-                <td>
-                  <span data-name={'startDate'}>{getDay(_data.startDate)}</span>
-                  <br />~
-                  <br />
-                  <span data-name={'endDate'}>{getDay(_data.endDate)}</span>
+                <td style={{ textAlign: 'center' }}>
+                  <Calendar
+                    value={_data.startDate}
+                    name={'startDate'}
+                    updateDate={(e, date) => updateDate(e, date, i)}
+                  />
+                  ~
+                  <Calendar value={_data.endDate} name={'endDate'} updateDate={(e, date) => updateDate(e, date, i)} />
                 </td>
                 <td>
                   <Button name={'connect'} onclick={(e) => startMailer(e, data[i])}>
@@ -233,13 +258,11 @@ const _Table = styled.table`
     &:nth-of-type(3),
     &:nth-of-type(4),
     &:nth-of-type(5) {
-      width: 210px;
+      width: 220px;
     }
-    &:nth-of-type(6) {
-      width: 155px;
-    }
+    &:nth-of-type(6),
     &:nth-of-type(7) {
-      width: 125px;
+      width: 120px;
     }
   }
   td {
