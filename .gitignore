@@ -2,3 +2,5 @@ node_modules
 dist
 src/userList.json
 src/mailer/config.ts
+src/mailer/templates/account.ts
+src/mailer/templates/connect.ts
