@@ -79,13 +79,17 @@ export const Top = memo(() => {
     return dayWeekArray[dayIndex];
   };
 
-  const formatDate = (_date: Date) => {
-    const year = _date.getFullYear();
-    const month = _date.getMonth() + 1;
-    const date = _date.getDate();
-    const day = getDay(_date);
+  const formatDate = (value: Date | string) => {
+    if (String(value).indexOf('Invalid Date') !== -1) return '';
+    else {
+      const _date = value as Date;
+      const year = _date.getFullYear();
+      const month = _date.getMonth() + 1;
+      const date = _date.getDate();
+      const day = getDay(_date);
 
-    return `${year}/${month}/${date}(${day})`;
+      return `${year}/${month}/${date}(${day})`;
+    }
   };
 
   const exchangeValue = (dataIndex: number) => {

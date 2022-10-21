@@ -13,7 +13,7 @@ type Props = {
 
 export const Calendar: FC<Props> = memo((props) => {
   const { value, name, updateDate } = props;
-  const [date, setDate] = useState<Date | null>(new Date(value));
+  const [date, setDate] = useState<Date | null>(value !== '' ? new Date(value) : null);
   registerLocale('ja', ja);
 
   const onChange = (date: Date, e: ChangeEvent<HTMLInputElement>) => {
